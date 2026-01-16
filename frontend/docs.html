@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 문서 - Upbit Trading Competition</title>
+    <!-- Theme JS (load early to prevent flash) -->
+    <script src="/static/common/theme.js"></script>
+    <style>
+        /* Theme CSS Variables */
+        :root, [data-theme="dark"] {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #222;
+            --bg-hover: #333;
+            --bg-code: #0a0a0a;
+            --text-primary: #fff;
+            --text-secondary: #e0e0e0;
+            --text-tertiary: #bbb;
+            --text-muted: #888;
+            --text-dimmed: #666;
+            --border-primary: #333;
+            --border-secondary: #222;
+            --accent-primary: #00d4aa;
+            --accent-hover: #00f5c4;
+            --code-keyword: #c678dd;
+            --code-string: #98c379;
+            --code-number: #d19a66;
+            --code-comment: #5c6370;
+            --code-property: #e06c75;
+            --code-method: #61afef;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e8e8e8;
+            --bg-hover: #ddd;
+            --bg-code: #f8f8f8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-tertiary: #555;
+            --text-muted: #666;
+            --text-dimmed: #888;
+            --border-primary: #ddd;
+            --border-secondary: #e5e5e5;
+            --accent-primary: #00a884;
+            --accent-hover: #00c49a;
+            --code-keyword: #a626a4;
+            --code-string: #50a14f;
+            --code-number: #986801;
+            --code-comment: #a0a1a7;
+            --code-property: #e45649;
+            --code-method: #4078f2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--text-primary);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 20px;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .sidebar-nav {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .sidebar-nav h3 {
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .sidebar-nav .section-title {
+            color: var(--text-dimmed);
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        /* Main content */
+        .main-content {
+            min-width: 0;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-top: 1rem;
+        }
+
+        h3 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--bg-code);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        code {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: var(--code-keyword); }
+        .string { color: var(--code-string); }
+        .number { color: var(--code-number); }
+        .comment { color: var(--code-comment); }
+        .property { color: var(--code-property); }
+        .method { color: var(--code-method); }
+
+        /* API endpoint */
+        .endpoint {
+            background: var(--bg-code);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .method-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .method-badge.get { background: #61afef; color: #000; }
+        .method-badge.post { background: #98c379; color: #000; }
+        .method-badge.delete { background: #e06c75; color: #000; }
+
+        .endpoint-path {
+            font-family: 'SF Mono', monospace;
+            color: var(--text-primary);
+        }
+
+        .endpoint-body {
+            padding: 1rem;
+        }
+
+        .endpoint-desc {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            font-size: 0.9rem;
+        }
+
+        td code {
+            color: var(--code-method);
+        }
+
+        .required {
+            color: var(--code-property);
+            font-size: 0.8rem;
+        }
+
+        .optional {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Alert boxes */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .alert-info {
+            background: rgba(97, 175, 239, 0.1);
+            border: 1px solid #61afef;
+        }
+
+        .alert-warning {
+            background: rgba(209, 154, 102, 0.1);
+            border: 1px solid #d19a66;
+        }
+
+        .alert-success {
+            background: rgba(152, 195, 121, 0.1);
+            border: 1px solid #98c379;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-primary);
+            color: #000;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Copy button */
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .code-container {
+            position: relative;
+        }
+
+        /* Response example */
+        .response-example {
+            background: var(--bg-code);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .response-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-primary);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .response-body {
+            padding: 1rem;
+        }
+
+        /* Supported coins */
+        .coin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .coin-badge {
+            background: var(--bg-tertiary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Upbit Trading Competition</div>
+        <nav class="nav">
+            <a href="/competition">대회</a>
+            <a href="/competition/trading">트레이딩</a>
+            <a href="/competition/leaderboard">리더보드</a>
+            <a href="/docs" class="active">API 문서</a>
+            <a href="/">시세 대시보드</a>
+            <a href="/admin" id="admin-link" style="display: none; color: #ef5350;">관리자</a>
+            <span id="theme-toggle-container"></span>
+        </nav>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <h3>API 문서</h3>
+                <ul>
+                    <li><a href="#getting-started">시작하기</a></li>
+                    <li><a href="#authentication">인증</a></li>
+                    <li><a href="#supported-coins">지원 코인</a></li>
+                </ul>
+
+                <div class="section-title">트레이딩 API</div>
+                <ul>
+                    <li><a href="#get-balance">잔고 조회</a></li>
+                    <li><a href="#get-positions">포지션 조회</a></li>
+                    <li><a href="#create-order">주문 생성</a></li>
+                    <li><a href="#list-orders">주문 내역</a></li>
+                    <li><a href="#cancel-order">주문 취소</a></li>
+                    <li><a href="#list-trades">거래 내역</a></li>
+                </ul>
+
+                <div class="section-title">시세 API</div>
+                <ul>
+                    <li><a href="#get-tickers">실시간 시세</a></li>
+                    <li><a href="#get-candles">캔들 데이터</a></li>
+                    <li><a href="#websocket">WebSocket</a></li>
+                </ul>
+
+                <div class="section-title">예제</div>
+                <ul>
+                    <li><a href="#example-python">Python 예제</a></li>
+                    <li><a href="#example-curl">cURL 예제</a></li>
+                </ul>
+
+                <div class="section-title">개발자 도구</div>
+                <ul>
+                    <li><a href="/swagger" target="_blank">Swagger UI ↗</a></li>
+                    <li><a href="/redoc" target="_blank">ReDoc ↗</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Getting Started -->
+            <section class="section" id="getting-started">
+                <h1>API 문서</h1>
+                <p>Upbit Trading Competition API를 사용하여 프로그래밍 방식으로 모의 투자를 할 수 있습니다.</p>
+
+                <h2>시작하기</h2>
+
+                <h3>1. 회원가입 및 대회 참가</h3>
+                <p>먼저 <a href="/competition" style="color: #00d4aa;">대회 페이지</a>에서 Clerk 계정으로 로그인하고 대회에 참가하세요.</p>
+
+                <h3>2. API Key 발급</h3>
+                <p>로그인 후 대회 페이지에서 API Key를 발급받으세요. API Key는 한 번만 표시되므로 안전하게 보관하세요.</p>
+
+                <div class="alert alert-warning">
+                    <strong>주의:</strong> API Key는 비밀번호처럼 안전하게 보관하세요. 절대 공개 저장소나 클라이언트 코드에 노출하지 마세요.
+                </div>
+
+                <h3>3. 기본 URL</h3>
+                <pre><code>https://your-domain.com/api</code></pre>
+
+                <div class="alert alert-info" style="margin-top: 1.5rem;">
+                    <strong>개발자 도구:</strong>
+                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                        <li><a href="/swagger" style="color: #61afef;" target="_blank">Swagger UI</a> - 인터랙티브 API 테스트 도구</li>
+                        <li><a href="/redoc" style="color: #61afef;" target="_blank">ReDoc</a> - API 레퍼런스 문서</li>
+                        <li><a href="/openapi.json" style="color: #61afef;" target="_blank">OpenAPI JSON</a> - API 스키마 (자동화용)</li>
+                    </ul>
+                </div>
+
+                <h3>4. 빠른 시작 가이드</h3>
+                <p>아래 순서대로 진행하면 5분 안에 첫 주문을 실행할 수 있습니다:</p>
+                <ol style="margin-left: 1.5rem; color: #bbb;">
+                    <li style="margin-bottom: 0.5rem;"><strong>회원가입</strong> - <a href="/competition" style="color: #00d4aa;">대회 페이지</a>에서 구글/깃헙 계정으로 로그인</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>대회 참가</strong> - "대회 참가" 버튼 클릭 (초기 자금 100만원 지급)</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>API Key 발급</strong> - "API Key 발급" 버튼 클릭 후 키 복사</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>시세 확인</strong> - <code>GET /tickers/latest</code>로 현재가 조회</li>
+                    <li style="margin-bottom: 0.5rem;"><strong>주문 실행</strong> - <code>POST /api/trading/orders</code>로 매수/매도</li>
+                </ol>
+            </section>
+
+            <!-- Authentication -->
+            <section class="section" id="authentication">
+                <h2>인증</h2>
+                <p>모든 트레이딩 API 요청에는 <code>X-API-Key</code> 헤더가 필요합니다.</p>
+
+                <pre><code><span class="property">X-API-Key</span>: <span class="string">your_api_key_here</span></code></pre>
+
+                <h3>인증 오류</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>상태 코드</th>
+                            <th>설명</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>401</code></td>
+                            <td>API Key가 없거나 유효하지 않음</td>
+                        </tr>
+                        <tr>
+                            <td><code>403</code></td>
+                            <td>API Key가 비활성화됨</td>
+                        </tr>
+                        <tr>
+                            <td><code>404</code></td>
+                            <td>활성 대회에 참가하지 않음</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Supported Coins -->
+            <section class="section" id="supported-coins">
+                <h2>지원 코인</h2>
+                <p>현재 지원하는 코인 목록입니다. 주문 시 <code>code</code> 파라미터에 사용합니다.</p>
+
+                <div class="coin-grid">
+                    <div class="coin-badge">KRW-BTC</div>
+                    <div class="coin-badge">KRW-ETH</div>
+                    <div class="coin-badge">KRW-XRP</div>
+                    <div class="coin-badge">KRW-SOL</div>
+                    <div class="coin-badge">KRW-DOGE</div>
+                    <div class="coin-badge">KRW-ADA</div>
+                    <div class="coin-badge">KRW-AVAX</div>
+                    <div class="coin-badge">KRW-DOT</div>
+                    <div class="coin-badge">KRW-LINK</div>
+                    <div class="coin-badge">KRW-MATIC</div>
+                </div>
+            </section>
+
+            <!-- Get Balance -->
+            <section class="section" id="get-balance">
+                <h2>잔고 조회</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/trading/balance</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">현재 KRW 잔고를 조회합니다.</p>
+
+                        <h4>Headers</h4>
+                        <table>
+                            <thead>
+                                <tr><th>이름</th><th>필수</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>X-API-Key</code></td>
+                                    <td><span class="required">필수</span></td>
+                                    <td>API Key</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="response-example">
+                            <div class="response-header">Response 200</div>
+                            <div class="response-body">
+<pre><code>{
+  <span class="property">"balance"</span>: <span class="number">1000000.0</span>,
+  <span class="property">"competition_id"</span>: <span class="string">"uuid-here"</span>,
+  <span class="property">"competition_name"</span>: <span class="string">"2024 Winter Competition"</span>
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Get Positions -->
+            <section class="section" id="get-positions">
+                <h2>포지션 조회</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/trading/positions</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">보유 중인 코인 목록을 조회합니다.</p>
+
+                        <div class="response-example">
+                            <div class="response-header">Response 200</div>
+                            <div class="response-body">
+<pre><code>[
+  {
+    <span class="property">"code"</span>: <span class="string">"KRW-BTC"</span>,
+    <span class="property">"quantity"</span>: <span class="number">0.001</span>,
+    <span class="property">"avg_buy_price"</span>: <span class="number">134000000.0</span>,
+    <span class="property">"total_value"</span>: <span class="number">134000.0</span>
+  }
+]</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Create Order -->
+            <section class="section" id="create-order">
+                <h2>주문 생성</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/trading/orders</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">매수/매도 주문을 생성합니다.</p>
+
+                        <div class="alert alert-info">
+                            <strong>시장가 주문:</strong> <code>current_price</code>로 즉시 체결됩니다.<br>
+                            <strong>지정가 주문:</strong> 지정한 <code>price</code>에 도달하면 체결됩니다.
+                        </div>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr><th>이름</th><th>필수</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>current_price</code></td>
+                                    <td><span class="required">필수</span></td>
+                                    <td>현재 시세 (시장가 체결가, 지정가 기준가)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Request Body</h4>
+                        <table>
+                            <thead>
+                                <tr><th>필드</th><th>타입</th><th>필수</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>code</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">필수</span></td>
+                                    <td>코인 코드 (예: KRW-BTC)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>side</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">필수</span></td>
+                                    <td><code>buy</code> 또는 <code>sell</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>order_type</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">필수</span></td>
+                                    <td><code>market</code> 또는 <code>limit</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity</code></td>
+                                    <td>number</td>
+                                    <td><span class="required">필수</span></td>
+                                    <td>주문 수량</td>
+                                </tr>
+                                <tr>
+                                    <td><code>price</code></td>
+                                    <td>number</td>
+                                    <td><span class="optional">지정가 필수</span></td>
+                                    <td>지정가 주문 시 가격</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>시장가 매수 예제</h4>
+<pre><code><span class="comment">// POST /api/trading/orders?current_price=134000000</span>
+{
+  <span class="property">"code"</span>: <span class="string">"KRW-BTC"</span>,
+  <span class="property">"side"</span>: <span class="string">"buy"</span>,
+  <span class="property">"order_type"</span>: <span class="string">"market"</span>,
+  <span class="property">"quantity"</span>: <span class="number">0.001</span>
+}</code></pre>
+
+                        <h4>지정가 매도 예제</h4>
+<pre><code><span class="comment">// POST /api/trading/orders?current_price=134000000</span>
+{
+  <span class="property">"code"</span>: <span class="string">"KRW-BTC"</span>,
+  <span class="property">"side"</span>: <span class="string">"sell"</span>,
+  <span class="property">"order_type"</span>: <span class="string">"limit"</span>,
+  <span class="property">"quantity"</span>: <span class="number">0.001</span>,
+  <span class="property">"price"</span>: <span class="number">140000000</span>
+}</code></pre>
+
+                        <div class="response-example">
+                            <div class="response-header">Response 200</div>
+                            <div class="response-body">
+<pre><code>{
+  <span class="property">"id"</span>: <span class="string">"order-uuid"</span>,
+  <span class="property">"code"</span>: <span class="string">"KRW-BTC"</span>,
+  <span class="property">"side"</span>: <span class="string">"buy"</span>,
+  <span class="property">"order_type"</span>: <span class="string">"market"</span>,
+  <span class="property">"price"</span>: <span class="number">null</span>,
+  <span class="property">"quantity"</span>: <span class="number">0.001</span>,
+  <span class="property">"filled_quantity"</span>: <span class="number">0.001</span>,
+  <span class="property">"filled_price"</span>: <span class="number">134000000.0</span>,
+  <span class="property">"fee"</span>: <span class="number">67.0</span>,
+  <span class="property">"status"</span>: <span class="string">"filled"</span>,
+  <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>,
+  <span class="property">"filled_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <h4>오류 응답</h4>
+                        <table>
+                            <thead>
+                                <tr><th>상태 코드</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>400</code></td>
+                                    <td>잔고 부족 / 보유량 부족 / 잘못된 파라미터</td>
+                                </tr>
+                                <tr>
+                                    <td><code>404</code></td>
+                                    <td>대회 참가자 아님</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- List Orders -->
+            <section class="section" id="list-orders">
+                <h2>주문 내역 조회</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/trading/orders</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">주문 내역을 조회합니다.</p>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr><th>이름</th><th>필수</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td><span class="optional">선택</span></td>
+                                    <td><code>pending</code>, <code>filled</code>, <code>cancelled</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>limit</code></td>
+                                    <td><span class="optional">선택</span></td>
+                                    <td>조회 개수 (기본: 50, 최대: 100)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cancel Order -->
+            <section class="section" id="cancel-order">
+                <h2>주문 취소</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method delete">DELETE</span>
+                        <span class="endpoint-path">/api/trading/orders/{order_id}</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">미체결 지정가 주문을 취소합니다.</p>
+
+                        <div class="alert alert-warning">
+                            <strong>주의:</strong> 이미 체결된 주문이나 시장가 주문은 취소할 수 없습니다.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- List Trades -->
+            <section class="section" id="list-trades">
+                <h2>거래 내역 조회</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/trading/trades</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">체결된 거래 내역을 조회합니다.</p>
+
+                        <div class="response-example">
+                            <div class="response-header">Response 200</div>
+                            <div class="response-body">
+<pre><code>[
+  {
+    <span class="property">"id"</span>: <span class="string">"trade-uuid"</span>,
+    <span class="property">"code"</span>: <span class="string">"KRW-BTC"</span>,
+    <span class="property">"side"</span>: <span class="string">"buy"</span>,
+    <span class="property">"price"</span>: <span class="number">134000000.0</span>,
+    <span class="property">"quantity"</span>: <span class="number">0.001</span>,
+    <span class="property">"total_amount"</span>: <span class="number">134000.0</span>,
+    <span class="property">"fee"</span>: <span class="number">67.0</span>,
+    <span class="property">"created_at"</span>: <span class="string">"2024-01-15T10:30:00Z"</span>
+  }
+]</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Get Tickers -->
+            <section class="section" id="get-tickers">
+                <h2>실시간 시세 조회</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/tickers/latest</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">모든 지원 코인의 최신 시세를 조회합니다. (인증 불필요)</p>
+
+                        <div class="response-example">
+                            <div class="response-header">Response 200</div>
+                            <div class="response-body">
+<pre><code>{
+  <span class="property">"KRW-BTC"</span>: {
+    <span class="property">"trade_price"</span>: <span class="number">134000000</span>,
+    <span class="property">"change"</span>: <span class="string">"RISE"</span>,
+    <span class="property">"change_rate"</span>: <span class="number">0.025</span>,
+    <span class="property">"trade_volume"</span>: <span class="number">0.5</span>,
+    <span class="property">"timestamp"</span>: <span class="number">1705312200000</span>
+  },
+  <span class="property">"KRW-ETH"</span>: { ... }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Get Candles -->
+            <section class="section" id="get-candles">
+                <h2>캔들 데이터 조회</h2>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/candles/{code}</span>
+                    </div>
+                    <div class="endpoint-body">
+                        <p class="endpoint-desc">OHLCV 캔들 데이터를 조회합니다. (인증 불필요)</p>
+
+                        <h4>Path Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr><th>이름</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>code</code></td>
+                                    <td>코인 코드 (예: KRW-BTC)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h4>Query Parameters</h4>
+                        <table>
+                            <thead>
+                                <tr><th>이름</th><th>필수</th><th>설명</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>interval</code></td>
+                                    <td><span class="optional">선택</span></td>
+                                    <td><code>1m</code>, <code>5m</code>, <code>15m</code>, <code>1h</code> (기본: 1m)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>limit</code></td>
+                                    <td><span class="optional">선택</span></td>
+                                    <td>조회 개수 (기본: 100, 최대: 500)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WebSocket -->
+            <section class="section" id="websocket">
+                <h2>WebSocket 실시간 시세</h2>
+                <p>WebSocket을 통해 실시간 시세를 받을 수 있습니다.</p>
+
+                <h3>연결</h3>
+                <pre><code><span class="keyword">wss</span>://coin.core.today/ws</code></pre>
+
+                <h3>구독</h3>
+                <p>연결 후 구독할 코인 목록을 전송합니다:</p>
+<pre><code>{
+  <span class="property">"subscribe"</span>: [<span class="string">"KRW-BTC"</span>, <span class="string">"KRW-ETH"</span>]
+}</code></pre>
+
+                <h3>수신 데이터</h3>
+<pre><code>{
+  <span class="property">"code"</span>: <span class="string">"KRW-BTC"</span>,
+  <span class="property">"trade_price"</span>: <span class="number">134000000</span>,
+  <span class="property">"trade_volume"</span>: <span class="number">0.001</span>,
+  <span class="property">"change"</span>: <span class="string">"RISE"</span>,
+  <span class="property">"change_rate"</span>: <span class="number">0.025</span>,
+  <span class="property">"timestamp"</span>: <span class="number">1705312200000</span>
+}</code></pre>
+            </section>
+
+            <!-- Python Example -->
+            <section class="section" id="example-python">
+                <h2>Python 예제</h2>
+
+                <h3>설치</h3>
+                <pre><code>pip install requests websockets</code></pre>
+
+                <h3>시세 조회 및 매수</h3>
+<pre><code><span class="keyword">import</span> requests
+
+API_KEY = <span class="string">"your_api_key_here"</span>
+BASE_URL = <span class="string">"https://your-domain.com"</span>
+
+headers = {<span class="string">"X-API-Key"</span>: API_KEY}
+
+<span class="comment"># 1. 현재 시세 조회</span>
+tickers = requests.<span class="method">get</span>(f<span class="string">"{BASE_URL}/tickers/latest"</span>).<span class="method">json</span>()
+btc_price = tickers[<span class="string">"KRW-BTC"</span>][<span class="string">"trade_price"</span>]
+<span class="keyword">print</span>(f<span class="string">"BTC 현재가: {btc_price:,} KRW"</span>)
+
+<span class="comment"># 2. 잔고 확인</span>
+balance = requests.<span class="method">get</span>(
+    f<span class="string">"{BASE_URL}/api/trading/balance"</span>,
+    headers=headers
+).<span class="method">json</span>()
+<span class="keyword">print</span>(f<span class="string">"보유 KRW: {balance['balance']:,}"</span>)
+
+<span class="comment"># 3. 시장가 매수 (0.001 BTC)</span>
+order = requests.<span class="method">post</span>(
+    f<span class="string">"{BASE_URL}/api/trading/orders"</span>,
+    headers=headers,
+    params={<span class="string">"current_price"</span>: btc_price},
+    json={
+        <span class="string">"code"</span>: <span class="string">"KRW-BTC"</span>,
+        <span class="string">"side"</span>: <span class="string">"buy"</span>,
+        <span class="string">"order_type"</span>: <span class="string">"market"</span>,
+        <span class="string">"quantity"</span>: <span class="number">0.001</span>
+    }
+).<span class="method">json</span>()
+
+<span class="keyword">print</span>(f<span class="string">"주문 결과: {order['status']}"</span>)
+<span class="keyword">print</span>(f<span class="string">"체결가: {order['filled_price']:,} KRW"</span>)
+<span class="keyword">print</span>(f<span class="string">"수수료: {order['fee']:,} KRW"</span>)</code></pre>
+
+                <h3>자동 매매 봇 예제</h3>
+<pre><code><span class="keyword">import</span> asyncio
+<span class="keyword">import</span> json
+<span class="keyword">import</span> websockets
+<span class="keyword">import</span> requests
+
+API_KEY = <span class="string">"your_api_key_here"</span>
+BASE_URL = <span class="string">"https://your-domain.com"</span>
+WS_URL = <span class="string">"wss://your-domain.com/ws"</span>
+
+<span class="comment"># 간단한 이동평균 전략</span>
+prices = []
+MA_PERIOD = <span class="number">10</span>
+
+<span class="keyword">async def</span> <span class="method">trading_bot</span>():
+    <span class="keyword">async with</span> websockets.<span class="method">connect</span>(WS_URL) <span class="keyword">as</span> ws:
+        <span class="comment"># BTC 구독</span>
+        <span class="keyword">await</span> ws.<span class="method">send</span>(json.<span class="method">dumps</span>({<span class="string">"subscribe"</span>: [<span class="string">"KRW-BTC"</span>]}))
+
+        <span class="keyword">async for</span> message <span class="keyword">in</span> ws:
+            data = json.<span class="method">loads</span>(message)
+            <span class="keyword">if</span> data.<span class="method">get</span>(<span class="string">"code"</span>) != <span class="string">"KRW-BTC"</span>:
+                <span class="keyword">continue</span>
+
+            price = data[<span class="string">"trade_price"</span>]
+            prices.<span class="method">append</span>(price)
+
+            <span class="keyword">if</span> <span class="method">len</span>(prices) < MA_PERIOD:
+                <span class="keyword">continue</span>
+
+            <span class="comment"># 이동평균 계산</span>
+            ma = <span class="method">sum</span>(prices[-MA_PERIOD:]) / MA_PERIOD
+
+            <span class="keyword">if</span> price > ma * <span class="number">1.01</span>:  <span class="comment"># 1% 이상 상승</span>
+                <span class="keyword">print</span>(f<span class="string">"매도 신호! 현재가: {price:,}"</span>)
+                <span class="comment"># sell_order(price)</span>
+            <span class="keyword">elif</span> price < ma * <span class="number">0.99</span>:  <span class="comment"># 1% 이상 하락</span>
+                <span class="keyword">print</span>(f<span class="string">"매수 신호! 현재가: {price:,}"</span>)
+                <span class="comment"># buy_order(price)</span>
+
+asyncio.<span class="method">run</span>(<span class="method">trading_bot</span>())</code></pre>
+            </section>
+
+            <!-- cURL Example -->
+            <section class="section" id="example-curl">
+                <h2>cURL 예제</h2>
+
+                <h3>잔고 조회</h3>
+<pre><code>curl -X GET "https://your-domain.com/api/trading/balance" \
+  -H "X-API-Key: your_api_key_here"</code></pre>
+
+                <h3>시장가 매수</h3>
+<pre><code>curl -X POST "https://your-domain.com/api/trading/orders?current_price=134000000" \
+  -H "X-API-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "KRW-BTC",
+    "side": "buy",
+    "order_type": "market",
+    "quantity": 0.001
+  }'</code></pre>
+
+                <h3>지정가 매도</h3>
+<pre><code>curl -X POST "https://your-domain.com/api/trading/orders?current_price=134000000" \
+  -H "X-API-Key: your_api_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code": "KRW-BTC",
+    "side": "sell",
+    "order_type": "limit",
+    "quantity": 0.001,
+    "price": 140000000
+  }'</code></pre>
+
+                <h3>주문 취소</h3>
+<pre><code>curl -X DELETE "https://your-domain.com/api/trading/orders/{order_id}" \
+  -H "X-API-Key: your_api_key_here"</code></pre>
+
+                <h3>거래 내역 조회</h3>
+<pre><code>curl -X GET "https://your-domain.com/api/trading/trades?limit=10" \
+  -H "X-API-Key: your_api_key_here"</code></pre>
+            </section>
+
+            <!-- Rate Limits -->
+            <section class="section" id="rate-limits">
+                <h2>제한 사항</h2>
+
+                <h3>수수료</h3>
+                <p>모든 거래에 <strong>0.05%</strong> 수수료가 적용됩니다.</p>
+
+                <h3>초기 자금</h3>
+                <p>대회 참가 시 <strong>1,000,000 KRW</strong>가 지급됩니다.</p>
+
+                <h3>지원 주문</h3>
+                <ul style="margin-left: 2rem; margin-top: 1rem;">
+                    <li><strong>시장가 주문:</strong> 현재 시세로 즉시 체결</li>
+                    <li><strong>지정가 주문:</strong> 지정한 가격에 도달하면 체결</li>
+                </ul>
+
+                <div class="alert alert-success" style="margin-top: 1.5rem;">
+                    <strong>팁:</strong> 실시간 시세는 WebSocket을 통해 받고, 주문은 REST API로 실행하는 것이 효율적입니다.
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+    <script src="/static/common/api.js"></script>
+</body>
+</html>

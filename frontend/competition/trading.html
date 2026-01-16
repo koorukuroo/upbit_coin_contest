@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>트레이딩 - 모의 투자 대회</title>
+    <!-- Theme JS (load early to prevent flash) -->
+    <script src="/static/common/theme.js"></script>
+    <style>
+        /* Theme CSS Variables */
+        :root, [data-theme="dark"] {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #222;
+            --bg-hover: #333;
+            --text-primary: #fff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #888;
+            --text-dimmed: #666;
+            --border-primary: #333;
+            --border-secondary: #222;
+            --accent-primary: #00d4aa;
+            --accent-hover: #00f5c4;
+            --price-up: #ef5350;
+            --price-down: #26a69a;
+            --chart-bg: #0f0f0f;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e8e8e8;
+            --bg-hover: #ddd;
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #666;
+            --text-dimmed: #999;
+            --border-primary: #ddd;
+            --border-secondary: #e5e5e5;
+            --accent-primary: #00a884;
+            --accent-hover: #00c49a;
+            --price-up: #d32f2f;
+            --price-down: #00897b;
+            --chart-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--text-primary);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 20px;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            height: calc(100vh - 60px);
+        }
+
+        /* 코인 목록 */
+        .coin-list {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-primary);
+            overflow-y: auto;
+        }
+
+        .coin-list-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+            font-weight: bold;
+        }
+
+        .coin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-secondary);
+            transition: background 0.2s;
+        }
+
+        .coin-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .coin-item.selected {
+            background: rgba(0, 212, 170, 0.1);
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .coin-name {
+            font-weight: bold;
+        }
+
+        .coin-price {
+            text-align: right;
+        }
+
+        .coin-price .price {
+            font-weight: bold;
+        }
+
+        .coin-price .change {
+            font-size: 0.85rem;
+        }
+
+        .change.up { color: var(--price-up); }
+        .change.down { color: var(--price-down); }
+        .change.even { color: var(--text-muted); }
+
+        /* 차트 영역 */
+        .chart-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selected-coin-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .selected-coin-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .selected-coin-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .ohlcv-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .ohlcv-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .ohlcv-label {
+            color: var(--text-dimmed);
+            font-weight: bold;
+        }
+
+        .ohlcv-value {
+            font-family: 'SF Mono', 'Consolas', monospace;
+            min-width: 80px;
+        }
+
+        .ohlcv-value.up { color: var(--price-up); }
+        .ohlcv-value.down { color: var(--price-down); }
+        .ohlcv-value.volume { color: #ffa726; }
+
+        .chart-container {
+            flex: 1;
+            padding: 1rem;
+            min-height: 400px;
+        }
+
+        /* 주문 패널 */
+        .order-panel {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border-primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .balance-info {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-label {
+            color: var(--text-muted);
+        }
+
+        .balance-value {
+            font-weight: bold;
+        }
+
+        .order-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .order-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .order-tab.active {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent-primary);
+        }
+
+        .order-tab.buy.active {
+            color: var(--price-up);
+            border-bottom-color: var(--price-up);
+        }
+
+        .order-tab.sell.active {
+            color: var(--price-down);
+            border-bottom-color: var(--price-down);
+        }
+
+        .order-form {
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .order-type-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-type-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .order-type-btn.active {
+            background: var(--accent-primary);
+            color: #000;
+        }
+
+        .percent-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .percent-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 4px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .percent-btn:hover {
+            background: var(--bg-hover);
+        }
+
+        .order-summary {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .summary-label {
+            color: var(--text-muted);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn.buy {
+            background: var(--price-up);
+            color: #fff;
+        }
+
+        .submit-btn.sell {
+            background: var(--price-down);
+            color: #fff;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .submit-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-dimmed);
+            cursor: not-allowed;
+        }
+
+        /* 하단 탭 */
+        .bottom-section {
+            border-top: 1px solid var(--border-primary);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .bottom-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-primary);
+            background: var(--bg-secondary);
+            position: sticky;
+            top: 0;
+        }
+
+        .bottom-tab {
+            padding: 0.75rem 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .bottom-tab.active {
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent-primary);
+        }
+
+        .bottom-content {
+            padding: 0.5rem;
+        }
+
+        .order-list-item, .trade-list-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .order-list-header, .trade-list-header {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .position-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .cancel-btn {
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-tertiary);
+            border: none;
+            border-radius: 4px;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* 로딩/에러 */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+
+        .error-message {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Upbit Trading Competition</div>
+        <nav class="nav">
+            <a href="/competition">대회</a>
+            <a href="/competition/trading" class="active">트레이딩</a>
+            <a href="/competition/leaderboard">리더보드</a>
+            <a href="/docs">API 문서</a>
+            <a href="/">시세 대시보드</a>
+            <a href="/admin" id="admin-link" style="display: none; color: #ef5350;">관리자</a>
+            <span id="theme-toggle-container"></span>
+        </nav>
+    </header>
+
+    <div id="error-container" class="error-message hidden"></div>
+
+    <div class="main-layout">
+        <!-- 코인 목록 -->
+        <div class="coin-list">
+            <div class="coin-list-header">코인 목록</div>
+            <div id="coin-list-content">
+                <div class="loading">로딩 중...</div>
+            </div>
+        </div>
+
+        <!-- 차트 영역 -->
+        <div class="chart-area">
+            <div class="chart-header">
+                <div class="selected-coin-info">
+                    <span id="selected-coin-name" class="selected-coin-name">KRW-BTC</span>
+                    <span id="selected-coin-price" class="selected-coin-price">-</span>
+                    <span id="selected-coin-change" class="change">-</span>
+                </div>
+                <div class="ohlcv-info">
+                    <span class="ohlcv-item"><span class="ohlcv-label">O</span><span id="ohlcv-open" class="ohlcv-value">-</span></span>
+                    <span class="ohlcv-item"><span class="ohlcv-label">H</span><span id="ohlcv-high" class="ohlcv-value up">-</span></span>
+                    <span class="ohlcv-item"><span class="ohlcv-label">L</span><span id="ohlcv-low" class="ohlcv-value down">-</span></span>
+                    <span class="ohlcv-item"><span class="ohlcv-label">C</span><span id="ohlcv-close" class="ohlcv-value">-</span></span>
+                    <span class="ohlcv-item"><span class="ohlcv-label">V</span><span id="ohlcv-volume" class="ohlcv-value volume">-</span></span>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-container"></div>
+
+            <!-- 하단 포지션/주문/거래 -->
+            <div class="bottom-section">
+                <div class="bottom-tabs">
+                    <button class="bottom-tab active" data-tab="positions">보유자산</button>
+                    <button class="bottom-tab" data-tab="orders">미체결</button>
+                    <button class="bottom-tab" data-tab="trades">체결내역</button>
+                </div>
+                <div class="bottom-content">
+                    <div id="positions-content">
+                        <div class="position-item order-list-header">
+                            <span>코인</span>
+                            <span>보유수량</span>
+                            <span>평균매수가</span>
+                            <span>평가금액</span>
+                        </div>
+                        <div id="positions-list"></div>
+                    </div>
+                    <div id="orders-content" class="hidden">
+                        <div class="order-list-item order-list-header">
+                            <span>코인</span>
+                            <span>구분</span>
+                            <span>가격</span>
+                            <span>수량</span>
+                            <span>취소</span>
+                        </div>
+                        <div id="orders-list"></div>
+                    </div>
+                    <div id="trades-content" class="hidden">
+                        <div class="trade-list-item trade-list-header">
+                            <span>시간</span>
+                            <span>코인</span>
+                            <span>구분</span>
+                            <span>가격</span>
+                            <span>수량</span>
+                        </div>
+                        <div id="trades-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 주문 패널 -->
+        <div class="order-panel">
+            <div class="balance-info">
+                <div class="balance-row">
+                    <span class="balance-label">보유 KRW</span>
+                    <span id="balance-krw" class="balance-value">-</span>
+                </div>
+                <div class="balance-row">
+                    <span class="balance-label">총 평가자산</span>
+                    <span id="balance-total" class="balance-value">-</span>
+                </div>
+            </div>
+
+            <div class="order-tabs">
+                <button class="order-tab buy active" data-side="buy">매수</button>
+                <button class="order-tab sell" data-side="sell">매도</button>
+            </div>
+
+            <div class="order-form">
+                <div class="order-type-selector">
+                    <button class="order-type-btn active" data-type="market">시장가</button>
+                    <button class="order-type-btn" data-type="limit">지정가</button>
+                </div>
+
+                <div id="limit-price-group" class="form-group hidden">
+                    <label>주문가격</label>
+                    <input type="number" id="order-price" placeholder="0" step="any">
+                </div>
+
+                <div class="form-group">
+                    <label>주문수량</label>
+                    <input type="number" id="order-quantity" placeholder="0" step="any">
+                    <div class="percent-buttons">
+                        <button class="percent-btn" data-percent="25">25%</button>
+                        <button class="percent-btn" data-percent="50">50%</button>
+                        <button class="percent-btn" data-percent="75">75%</button>
+                        <button class="percent-btn" data-percent="100">100%</button>
+                    </div>
+                </div>
+
+                <div class="order-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">주문총액</span>
+                        <span id="order-total">0 KRW</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">수수료 (0.05%)</span>
+                        <span id="order-fee">0 KRW</span>
+                    </div>
+                </div>
+
+                <button id="submit-order" class="submit-btn buy" disabled>매수</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="/static/common/api.js"></script>
+    <script src="/static/competition/trading.js"></script>
+</body>
+</html>

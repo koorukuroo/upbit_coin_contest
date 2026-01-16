@@ -1,0 +1,19 @@
+# 기존 의존성
+websocket-client
+websockets
+requests
+clickhouse-connect
+fastapi
+uvicorn[standard]
+
+# 모의투자 대회 시스템 추가
+asyncpg
+sqlalchemy[asyncio]
+greenlet
+pyjwt
+cryptography
+python-dotenv
+httpx
+
+# Redis 캐싱
+redis[hiredis]

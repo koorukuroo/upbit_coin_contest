@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모의 투자 대회</title>
+    <!-- Theme JS (load early to prevent flash) -->
+    <script src="/static/common/theme.js"></script>
+    <style>
+        /* Theme CSS Variables */
+        :root, [data-theme="dark"] {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #222;
+            --bg-hover: #333;
+            --text-primary: #fff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #888;
+            --border-primary: #333;
+            --border-secondary: #222;
+            --accent-primary: #00d4aa;
+            --accent-hover: #00f5c4;
+            --price-up: #ef5350;
+            --price-down: #26a69a;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e8e8e8;
+            --bg-hover: #ddd;
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #666;
+            --border-primary: #ddd;
+            --border-secondary: #e5e5e5;
+            --accent-primary: #00a884;
+            --accent-hover: #00c49a;
+            --price-up: #d32f2f;
+            --price-down: #00897b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-primary);
+        }
+
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--text-primary);
+        }
+
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .competition-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-primary);
+        }
+
+        .competition-card.active {
+            border-color: var(--accent-primary);
+        }
+
+        .competition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .competition-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--accent-primary);
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-ended {
+            background: rgba(108, 117, 125, 0.2);
+            color: #6c757d;
+        }
+
+        .competition-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .competition-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* API Key 섹션 */
+        .api-key-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-primary);
+        }
+
+        .api-key-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .api-key-list {
+            margin: 1rem 0;
+        }
+
+        .api-key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .api-key-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .api-key-prefix {
+            font-family: monospace;
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .new-key-display {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .new-key-display code {
+            font-family: monospace;
+            font-size: 1rem;
+            word-break: break-all;
+        }
+
+        .warning {
+            color: #ffc107;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* 로그인 필요 메시지 */
+        .login-required {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .login-required h2 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 20px;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Upbit Trading Competition</div>
+        <nav class="nav">
+            <a href="/competition" class="active">대회</a>
+            <a href="/competition/trading">트레이딩</a>
+            <a href="/competition/leaderboard">리더보드</a>
+            <a href="/docs">API 문서</a>
+            <a href="/">시세 대시보드</a>
+            <a href="/admin" id="admin-link" style="display: none; color: #ef5350;">관리자</a>
+        </nav>
+        <div class="auth-section">
+            <span id="theme-toggle-container"></span>
+            <div id="user-info" class="hidden">
+                <span class="user-email"></span>
+            </div>
+            <button id="login-btn" class="btn btn-primary" onclick="authManager.openSignIn()">로그인</button>
+            <button id="logout-btn" class="btn btn-secondary hidden" onclick="authManager.signOut()">로그아웃</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero">
+            <h1>모의 투자 대회</h1>
+            <p>실시간 Upbit 시세로 가상 자금 100만원으로 트레이딩 대회에 참가하세요</p>
+        </section>
+
+        <!-- 로그인 필요 -->
+        <div id="login-required" class="login-required">
+            <h2>로그인이 필요합니다</h2>
+            <p>대회에 참가하려면 먼저 로그인해주세요</p>
+            <button class="btn btn-primary" onclick="authManager.openSignIn()" style="margin-top: 1rem;">로그인</button>
+        </div>
+
+        <!-- 메인 콘텐츠 (로그인 후) -->
+        <div id="main-content" class="hidden">
+            <!-- 현재 진행 중인 대회 -->
+            <div id="active-competition">
+                <h2 style="margin-bottom: 1rem;">진행 중인 대회</h2>
+                <div id="active-competition-content">
+                    <p style="color: #888;">현재 진행 중인 대회가 없습니다.</p>
+                </div>
+            </div>
+
+            <!-- API Key 관리 -->
+            <div class="api-key-section">
+                <h2>API Key 관리</h2>
+                <p style="color: #888; margin-bottom: 1rem;">트레이딩에 사용할 API Key를 발급받으세요</p>
+
+                <div id="new-key-display" class="new-key-display hidden">
+                    <strong>새 API Key가 발급되었습니다:</strong>
+                    <code id="new-key-value"></code>
+                    <p class="warning">이 키는 다시 표시되지 않습니다. 안전한 곳에 저장하세요!</p>
+                    <button class="btn btn-secondary" onclick="copyApiKey()" style="margin-top: 0.5rem;">복사</button>
+                    <button class="btn btn-primary" onclick="useApiKey()" style="margin-top: 0.5rem;">이 키 사용하기</button>
+                </div>
+
+                <div id="api-key-list" class="api-key-list">
+                    <p style="color: #888;">발급된 API Key가 없습니다.</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="createNewApiKey()">새 API Key 발급</button>
+            </div>
+
+            <!-- 예정된 대회 -->
+            <div id="pending-competitions" style="margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">예정된 대회</h2>
+                <div id="pending-competitions-list">
+                    <p style="color: #888;">예정된 대회가 없습니다.</p>
+                </div>
+            </div>
+
+            <!-- 지난 대회 -->
+            <div id="past-competitions" style="margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">지난 대회</h2>
+                <div id="past-competitions-list">
+                    <p style="color: #888;">지난 대회가 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clerk SDK -->
+    <!-- TODO: Replace YOUR_CLERK_PUBLISHABLE_KEY with your Clerk publishable key from https://clerk.com -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="YOUR_CLERK_PUBLISHABLE_KEY"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+
+    <script src="/static/common/api.js"></script>
+    <script src="/static/auth/auth.js"></script>
+    <script>
+        let currentNewKey = null;
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Clerk 초기화 대기
+            if (window.Clerk) {
+                await authManager.init();
+            } else {
+                // Clerk SDK 로드 대기
+                window.addEventListener('load', async () => {
+                    if (window.Clerk) {
+                        await authManager.init();
+                    }
+                });
+            }
+        });
+
+        // 인증 상태 변경 시
+        authManager.onAuthChange(async ({ isLoggedIn }) => {
+            document.getElementById('login-required').classList.toggle('hidden', isLoggedIn);
+            document.getElementById('main-content').classList.toggle('hidden', !isLoggedIn);
+
+            if (isLoggedIn) {
+                await loadCompetitions();
+                await loadApiKeys();
+            }
+        });
+
+        // 대회 목록 로드
+        async function loadCompetitions() {
+            try {
+                // 전체 대회 목록
+                const allComps = await tradingAPI.getCompetitions();
+
+                // 활성 대회들 (여러 개 가능)
+                const activeComps = allComps.filter(c => c.status === 'active');
+                const activeEl = document.getElementById('active-competition-content');
+
+                if (activeComps.length > 0) {
+                    // 각 활성 대회에 대해 참가 상태 확인
+                    const activeCardsHtml = await Promise.all(activeComps.map(async (comp) => {
+                        let myStatus = null;
+                        try {
+                            myStatus = await tradingAPI.getMyStatus(comp.id);
+                        } catch (e) {}
+                        return renderCompetitionCard(comp, myStatus);
+                    }));
+                    activeEl.innerHTML = activeCardsHtml.join('');
+                } else {
+                    activeEl.innerHTML = '<p style="color: #888;">현재 진행 중인 대회가 없습니다.</p>';
+                }
+
+                // 예정된 대회
+                const pendingComps = allComps.filter(c => c.status === 'pending');
+                const pendingEl = document.getElementById('pending-competitions-list');
+
+                if (pendingComps.length > 0) {
+                    pendingEl.innerHTML = pendingComps.map(c => renderCompetitionCard(c, null)).join('');
+                } else {
+                    pendingEl.innerHTML = '<p style="color: #888;">예정된 대회가 없습니다.</p>';
+                }
+
+                // 지난 대회
+                const pastComps = allComps.filter(c => c.status === 'ended');
+                const pastEl = document.getElementById('past-competitions-list');
+
+                if (pastComps.length > 0) {
+                    pastEl.innerHTML = pastComps.map(c => renderCompetitionCard(c, null, true)).join('');
+                } else {
+                    pastEl.innerHTML = '<p style="color: #888;">지난 대회가 없습니다.</p>';
+                }
+
+            } catch (error) {
+                console.error('Failed to load competitions:', error);
+            }
+        }
+
+        // 대회 카드 렌더링
+        function renderCompetitionCard(comp, myStatus, isPast = false) {
+            const statusClass = comp.status === 'active' ? 'status-active' :
+                               comp.status === 'pending' ? 'status-pending' : 'status-ended';
+            const statusText = comp.status === 'active' ? '진행 중' :
+                              comp.status === 'pending' ? '예정' : '종료';
+
+            // 서버는 UTC naive datetime을 반환하므로 Z를 붙여서 UTC로 파싱
+            const startTimeStr = comp.start_time.endsWith('Z') ? comp.start_time : comp.start_time + 'Z';
+            const endTimeStr = comp.end_time.endsWith('Z') ? comp.end_time : comp.end_time + 'Z';
+            const startDate = new Date(startTimeStr).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+            const endDate = new Date(endTimeStr).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+            let actionButton = '';
+            if (comp.status === 'active') {
+                if (myStatus) {
+                    actionButton = `
+                        <a href="/competition/trading" class="btn btn-primary">트레이딩 시작</a>
+                        <a href="/competition/leaderboard?id=${comp.id}" class="btn btn-secondary">리더보드</a>
+                    `;
+                } else {
+                    actionButton = `<button class="btn btn-primary" onclick="joinCompetition('${comp.id}')">참가하기</button>`;
+                }
+            } else if (comp.status === 'ended') {
+                actionButton = `<a href="/competition/leaderboard?id=${comp.id}" class="btn btn-secondary">결과 보기</a>`;
+            }
+
+            return `
+                <div class="competition-card ${comp.status === 'active' ? 'active' : ''}">
+                    <div class="competition-header">
+                        <span class="competition-title">${comp.name}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    ${comp.description ? `<p style="color: #888;">${comp.description}</p>` : ''}
+                    <div class="competition-info">
+                        <div class="info-item">
+                            <div class="info-label">시작 자금</div>
+                            <div class="info-value">${Number(comp.initial_balance).toLocaleString()}원</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">수수료</div>
+                            <div class="info-value">${(comp.fee_rate * 100).toFixed(2)}%</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">참가자</div>
+                            <div class="info-value">${comp.participant_count}명</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">기간 (한국시간)</div>
+                            <div class="info-value" style="font-size: 0.9rem;">${startDate}<br>~ ${endDate}</div>
+                        </div>
+                    </div>
+                    ${myStatus ? `<p style="color: #00d4aa;">현재 잔고: ${Number(myStatus.balance).toLocaleString()}원</p>` : ''}
+                    <div class="competition-actions">
+                        ${actionButton}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 대회 참가
+        async function joinCompetition(competitionId) {
+            if (!tradingAPI.apiKey) {
+                alert('먼저 API Key를 발급받고 사용 설정해주세요.');
+                return;
+            }
+
+            try {
+                await tradingAPI.joinCompetition(competitionId);
+                alert('대회에 참가했습니다!');
+                await loadCompetitions();
+            } catch (error) {
+                alert('참가 실패: ' + error.message);
+            }
+        }
+
+        // API Key 목록 로드
+        async function loadApiKeys() {
+            try {
+                const keys = await authManager.fetchApiKeys();
+                const listEl = document.getElementById('api-key-list');
+
+                if (keys.length > 0) {
+                    listEl.innerHTML = keys.map(key => `
+                        <div class="api-key-item">
+                            <div class="api-key-info">
+                                <span class="api-key-prefix">${key.prefix}...</span>
+                                <span>${key.name}</span>
+                                <span style="color: ${key.is_active ? '#00d4aa' : '#888'};">
+                                    ${key.is_active ? '활성' : '비활성'}
+                                </span>
+                            </div>
+                            <div>
+                                <button class="btn btn-secondary" onclick="selectApiKey('${key.prefix}')">사용</button>
+                                <button class="btn btn-secondary" onclick="deleteApiKey('${key.id}')" style="color: #ff4444;">삭제</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<p style="color: #888;">발급된 API Key가 없습니다.</p>';
+                }
+            } catch (error) {
+                console.error('Failed to load API keys:', error);
+            }
+        }
+
+        // 새 API Key 발급
+        async function createNewApiKey() {
+            try {
+                const newKey = await authManager.createApiKey('Trading Key');
+                currentNewKey = newKey.api_key;
+
+                document.getElementById('new-key-value').textContent = currentNewKey;
+                document.getElementById('new-key-display').classList.remove('hidden');
+
+                await loadApiKeys();
+            } catch (error) {
+                alert('API Key 발급 실패: ' + error.message);
+            }
+        }
+
+        // API Key 복사
+        function copyApiKey() {
+            if (currentNewKey) {
+                navigator.clipboard.writeText(currentNewKey);
+                alert('API Key가 클립보드에 복사되었습니다.');
+            }
+        }
+
+        // 새 API Key 사용
+        function useApiKey() {
+            if (currentNewKey) {
+                tradingAPI.setApiKey(currentNewKey);
+                alert('API Key가 설정되었습니다. 이제 트레이딩할 수 있습니다.');
+                document.getElementById('new-key-display').classList.add('hidden');
+            }
+        }
+
+        // 기존 API Key 선택
+        function selectApiKey(prefix) {
+            const key = prompt('전체 API Key를 입력하세요:');
+            if (key && key.startsWith(prefix)) {
+                tradingAPI.setApiKey(key);
+                alert('API Key가 설정되었습니다.');
+            } else if (key) {
+                alert('입력한 키가 선택한 키와 일치하지 않습니다.');
+            }
+        }
+
+        // API Key 삭제
+        async function deleteApiKey(keyId) {
+            if (!confirm('이 API Key를 삭제하시겠습니까?')) return;
+
+            try {
+                await authManager.deleteApiKey(keyId);
+                await loadApiKeys();
+            } catch (error) {
+                alert('삭제 실패: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

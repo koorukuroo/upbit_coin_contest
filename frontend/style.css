@@ -1,0 +1,542 @@
+/* Theme CSS Variables */
+:root, [data-theme="dark"] {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #1f3460;
+    --bg-hover: #2d4a7c;
+
+    --text-primary: #fff;
+    --text-secondary: #eee;
+    --text-muted: #aaa;
+    --text-dimmed: #888;
+
+    --border-primary: #2d4a7c;
+    --border-secondary: #1f3460;
+
+    --accent-primary: #0984e3;
+    --accent-secondary: #00b894;
+
+    --price-up: #d63031;
+    --price-down: #0984e3;
+}
+
+[data-theme="light"] {
+    --bg-primary: #f0f2f5;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e8eaed;
+    --bg-hover: #dde0e4;
+
+    --text-primary: #1a1a2e;
+    --text-secondary: #333;
+    --text-muted: #666;
+    --text-dimmed: #888;
+
+    --border-primary: #d0d3d8;
+    --border-secondary: #e5e7eb;
+
+    --accent-primary: #0066cc;
+    --accent-secondary: #00a67e;
+
+    --price-up: #c0392b;
+    --price-down: #0066cc;
+}
+
+/* 기본 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    min-height: 100vh;
+    padding: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 헤더 */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#current-time {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+#connection-status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+#connection-status.connected {
+    background: var(--accent-secondary);
+    color: #fff;
+}
+
+#connection-status.disconnected {
+    background: var(--price-up);
+    color: #fff;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* 티커 보드 */
+#ticker-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ticker-card {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.ticker-card:hover {
+    background: var(--bg-tertiary);
+    transform: translateY(-2px);
+}
+
+.ticker-card.selected {
+    border-color: var(--accent-primary);
+}
+
+.ticker-card.flash-rise {
+    animation: flashRise 0.3s ease;
+}
+
+.ticker-card.flash-fall {
+    animation: flashFall 0.3s ease;
+}
+
+@keyframes flashRise {
+    0%, 100% { background: var(--bg-secondary); }
+    50% { background: rgba(214, 48, 49, 0.3); }
+}
+
+@keyframes flashFall {
+    0%, 100% { background: var(--bg-secondary); }
+    50% { background: rgba(9, 132, 227, 0.3); }
+}
+
+.ticker-name {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.ticker-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.ticker-change {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.ticker-change.rise {
+    color: var(--price-up);
+}
+
+.ticker-change.fall {
+    color: var(--price-down);
+}
+
+.ticker-change.even {
+    color: var(--text-muted);
+}
+
+/* 차트 컨트롤 */
+#chart-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-group label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+#coin-select {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+#coin-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.interval-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.interval-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.interval-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.interval-btn.active {
+    background: var(--accent-primary);
+    color: #fff;
+}
+
+/* 차트 도구 버튼 */
+.chart-tools {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.tool-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    border: 1px solid var(--border-primary);
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.tool-btn.toggle.active {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+    color: #fff;
+}
+
+.tool-btn span {
+    display: inline-block;
+}
+
+/* 차트 영역 */
+#chart-section {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#chart-container {
+    width: 100%;
+    height: 400px;
+}
+
+/* 실시간 거래 내역 */
+#trades-section {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.trades-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.trades-header h3 {
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.trades-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.trades-stats strong {
+    color: var(--accent-secondary);
+    font-weight: bold;
+}
+
+.trades-table-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.trades-table-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.trades-table-wrapper::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.trades-table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--bg-hover);
+    border-radius: 4px;
+}
+
+#trades-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+#trades-table thead {
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary);
+    z-index: 1;
+}
+
+#trades-table th {
+    padding: 10px 8px;
+    text-align: left;
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+#trades-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border-secondary);
+}
+
+#trades-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+#trades-table tbody tr:hover {
+    background: var(--bg-tertiary);
+}
+
+#trades-table tbody tr.new-row {
+    animation: newRowFlash 0.5s ease;
+}
+
+@keyframes newRowFlash {
+    0% { background: rgba(0, 184, 148, 0.3); }
+    100% { background: transparent; }
+}
+
+.trade-time {
+    color: var(--text-dimmed);
+    font-family: monospace;
+}
+
+.trade-code {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.trade-price {
+    font-weight: 600;
+    font-family: monospace;
+}
+
+.trade-price.rise {
+    color: var(--price-up);
+}
+
+.trade-price.fall {
+    color: var(--price-down);
+}
+
+.trade-volume {
+    color: var(--text-muted);
+    font-family: monospace;
+}
+
+.trade-change {
+    font-weight: 600;
+}
+
+.trade-change.rise {
+    color: var(--price-up);
+}
+
+.trade-change.fall {
+    color: var(--price-down);
+}
+
+.trade-side {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.trade-side.ask {
+    background: rgba(9, 132, 227, 0.2);
+    color: var(--price-down);
+}
+
+.trade-side.bid {
+    background: rgba(214, 48, 49, 0.2);
+    color: var(--price-up);
+}
+
+/* 요약 통계 */
+#summary-section {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+#summary-section h3 {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+
+#summary-code {
+    color: var(--accent-primary);
+    font-weight: bold;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.summary-item {
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.summary-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.summary-value.rise {
+    color: var(--price-up);
+}
+
+.summary-value.fall {
+    color: var(--price-down);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+    }
+
+    #ticker-board {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #chart-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .interval-buttons {
+        justify-content: center;
+    }
+
+    #chart-container {
+        height: 300px;
+    }
+}

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대회 관리 - 관리자</title>
+    <!-- Theme JS (load early to prevent flash) -->
+    <script src="/static/common/theme.js"></script>
+    <style>
+        /* Theme CSS Variables */
+        :root, [data-theme="dark"] {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #222;
+            --bg-hover: #333;
+            --text-primary: #fff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #888;
+            --border-primary: #333;
+            --border-secondary: #222;
+            --accent-primary: #00d4aa;
+            --accent-hover: #00f5c4;
+            --danger: #ef5350;
+            --warning: #ffa726;
+            --success: #66bb6a;
+            --price-up: #ef5350;
+            --price-down: #26a69a;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-tertiary: #e8e8e8;
+            --bg-hover: #ddd;
+            --text-primary: #1a1a1a;
+            --text-secondary: #333;
+            --text-muted: #666;
+            --border-primary: #ddd;
+            --border-secondary: #e5e5e5;
+            --accent-primary: #00a884;
+            --accent-hover: #00c49a;
+            --danger: #d32f2f;
+            --warning: #f57c00;
+            --success: #388e3c;
+            --price-up: #d32f2f;
+            --price-down: #00897b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover, .nav a.active {
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-logout:hover {
+            opacity: 0.9;
+        }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .competition-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(102, 187, 106, 0.2);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(255, 167, 38, 0.2);
+            color: var(--warning);
+        }
+
+        .status-ended {
+            background: rgba(136, 136, 136, 0.2);
+            color: var(--text-muted);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-primary);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .info-item label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-item .value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .rank {
+            font-weight: bold;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .profit-positive {
+            color: var(--price-up);
+        }
+
+        .profit-negative {
+            color: var(--price-down);
+        }
+
+        .profit-zero {
+            color: var(--text-muted);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-email {
+            font-weight: 500;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-primary);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .export-section {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .table th, .table td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Admin Panel</div>
+        <nav class="nav">
+            <a href="/admin">대시보드</a>
+            <a href="/competition">대회</a>
+            <a href="/docs">API 문서</a>
+            <a href="/">시세 대시보드</a>
+            <span id="theme-toggle-container"></span>
+            <div class="user-info-header">
+                <span id="user-email"></span>
+                <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/admin">관리자</a>
+            <span>/</span>
+            <span id="breadcrumb-name">대회 상세</span>
+        </div>
+
+        <div id="loading" class="loading">로딩 중...</div>
+
+        <div id="content" style="display: none;">
+            <div class="page-header">
+                <div>
+                    <h1 id="competition-name">대회명</h1>
+                    <div class="competition-meta">
+                        <span id="competition-status"></span>
+                        <span id="competition-period"></span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="showEditModal()">수정</button>
+                    <button class="btn btn-primary" id="btn-activate" style="display: none;" onclick="activateCompetition()">활성화</button>
+                    <button class="btn btn-danger" id="btn-end" style="display: none;" onclick="endCompetition()">종료</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 style="margin-bottom: 1rem;">대회 정보</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>시작 자금</label>
+                        <div class="value" id="info-balance">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>수수료율</label>
+                        <div class="value" id="info-fee">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>참가자 수</label>
+                        <div class="value" id="info-participants">-</div>
+                    </div>
+                    <div class="info-item">
+                        <label>생성일</label>
+                        <div class="value" id="info-created">-</div>
+                    </div>
+                </div>
+                <div id="competition-description" style="margin-top: 1rem; color: var(--text-muted);"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2>참가자 목록 (실명)</h2>
+                    <div class="export-section">
+                        <button class="btn btn-secondary" onclick="exportParticipants('csv')">CSV 다운로드</button>
+                        <button class="btn btn-secondary" onclick="exportParticipants('json')">JSON 다운로드</button>
+                        <button class="btn btn-secondary" onclick="loadParticipants()">새로고침</button>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>순위</th>
+                            <th>사용자 (이메일)</th>
+                            <th style="text-align: right;">KRW 잔고</th>
+                            <th style="text-align: right;">코인 평가액</th>
+                            <th style="text-align: right;">총 자산</th>
+                            <th style="text-align: right;">수익률</th>
+                            <th>거래</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody id="participants-body">
+                        <tr><td colspan="8" class="loading">로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 수정 모달 -->
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>대회 수정</h3>
+                <button class="modal-close" onclick="closeModal('edit-modal')">&times;</button>
+            </div>
+            <form id="edit-form" onsubmit="updateCompetition(event)">
+                <div class="form-group">
+                    <label>대회 이름</label>
+                    <input type="text" name="name" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label>설명</label>
+                    <textarea name="description" id="edit-description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>시작 자금 (KRW)</label>
+                    <input type="number" name="initial_balance" id="edit-balance" required>
+                </div>
+                <div class="form-group">
+                    <label>수수료율</label>
+                    <input type="number" name="fee_rate" id="edit-fee" step="0.0001" required>
+                </div>
+                <div class="form-group">
+                    <label>시작 시간 (한국시간)</label>
+                    <input type="datetime-local" name="start_time" id="edit-start" required>
+                </div>
+                <div class="form-group">
+                    <label>종료 시간 (한국시간)</label>
+                    <input type="datetime-local" name="end_time" id="edit-end" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('edit-modal')">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 상금 지급 모달 -->
+    <div class="modal" id="award-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>상금 지급</h3>
+                <button class="modal-close" onclick="closeModal('award-modal')">&times;</button>
+            </div>
+            <form id="award-form" onsubmit="awardParticipant(event)">
+                <div class="form-group">
+                    <label>수령자</label>
+                    <input type="text" id="award-recipient" readonly style="background: var(--bg-primary);">
+                    <input type="hidden" id="award-participant-id">
+                </div>
+                <div class="form-group">
+                    <label>상금 (KRW)</label>
+                    <input type="number" name="amount" id="award-amount" required placeholder="예: 100000">
+                </div>
+                <div class="form-group">
+                    <label>사유</label>
+                    <input type="text" name="reason" id="award-reason" value="상금 지급" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('award-modal')">취소</button>
+                    <button type="submit" class="btn btn-primary">지급 기록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Clerk SDK -->
+    <!-- TODO: Replace YOUR_CLERK_PUBLISHABLE_KEY with your Clerk publishable key from https://clerk.com -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="YOUR_CLERK_PUBLISHABLE_KEY"
+        src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+
+    <script src="/static/common/api.js"></script>
+    <script>
+        let competitionId = null;
+        let competition = null;
+        let participants = [];
+        let currentPrices = {};
+        let ws = null;
+
+        const CODES = ['KRW-BTC', 'KRW-ETH', 'KRW-XRP', 'KRW-SOL', 'KRW-DOGE',
+                       'KRW-ADA', 'KRW-AVAX', 'KRW-DOT', 'KRW-LINK', 'KRW-MATIC'];
+
+        // Clerk 로드 대기
+        async function waitForClerk() {
+            return new Promise((resolve) => {
+                if (window.Clerk) {
+                    resolve();
+                } else {
+                    const checkInterval = setInterval(() => {
+                        if (window.Clerk) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }, 5000);
+                }
+            });
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            await waitForClerk();
+
+            // 현재 로그인한 사용자 이메일 표시
+            if (window.Clerk && window.Clerk.user) {
+                const email = window.Clerk.user.primaryEmailAddress?.emailAddress;
+                if (email) {
+                    document.getElementById('user-email').textContent = email;
+                }
+
+                // 먼저 register를 호출하여 이메일 업데이트 (기존 @clerk.dev 이메일 수정)
+                const token = await window.Clerk.session.getToken();
+                if (token) {
+                    await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+            }
+
+            // URL에서 대회 ID 추출
+            const pathParts = window.location.pathname.split('/');
+            competitionId = pathParts[pathParts.length - 1];
+
+            if (!competitionId) {
+                alert('대회 ID가 없습니다.');
+                window.location.href = '/admin';
+                return;
+            }
+
+            // WebSocket 연결 (시세용)
+            connectWebSocket();
+
+            // 대회 정보 로드
+            await loadCompetition();
+
+            // 참가자 로드
+            await loadParticipants();
+        });
+
+        // 로그아웃
+        async function logout() {
+            if (window.Clerk) {
+                await window.Clerk.signOut();
+                window.location.href = '/competition';
+            }
+        }
+
+        // WebSocket 연결
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+            ws.onopen = () => {
+                ws.send(JSON.stringify({ subscribe: CODES }));
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.code && data.trade_price) {
+                    currentPrices[data.code] = data.trade_price;
+                }
+            };
+
+            ws.onclose = () => {
+                setTimeout(connectWebSocket, 1000);
+            };
+        }
+
+        // 대회 정보 로드
+        async function loadCompetition() {
+            try {
+                competition = await tradingAPI.getCompetition(competitionId);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+                // UI 업데이트
+                document.getElementById('competition-name').textContent = competition.name;
+                document.getElementById('breadcrumb-name').textContent = competition.name;
+
+                const statusClass = `status-${competition.status}`;
+                const statusText = competition.status === 'active' ? '진행중' :
+                                   competition.status === 'pending' ? '예정' : '종료';
+                document.getElementById('competition-status').innerHTML =
+                    `<span class="status-badge ${statusClass}">${statusText}</span>`;
+
+                // 서버는 UTC naive datetime을 반환하므로 Z를 붙여서 UTC로 파싱
+                const startTimeStr = competition.start_time.endsWith('Z') ? competition.start_time : competition.start_time + 'Z';
+                const endTimeStr = competition.end_time.endsWith('Z') ? competition.end_time : competition.end_time + 'Z';
+                const startDate = new Date(startTimeStr).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+                const endDate = new Date(endTimeStr).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
+                document.getElementById('competition-period').textContent = `${startDate} ~ ${endDate} (한국시간)`;
+
+                document.getElementById('info-balance').textContent =
+                    Number(competition.initial_balance).toLocaleString() + '원';
+                document.getElementById('info-fee').textContent =
+                    (competition.fee_rate * 100).toFixed(2) + '%';
+                document.getElementById('info-participants').textContent =
+                    (competition.participant_count || 0) + '명';
+                document.getElementById('info-created').textContent =
+                    new Date(startTimeStr).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+
+                if (competition.description) {
+                    document.getElementById('competition-description').textContent = competition.description;
+                }
+
+                // 버튼 표시
+                if (competition.status === 'pending') {
+                    document.getElementById('btn-activate').style.display = 'inline-block';
+                } else if (competition.status === 'active') {
+                    document.getElementById('btn-end').style.display = 'inline-block';
+                }
+
+            } catch (error) {
+                console.error('Failed to load competition:', error);
+                alert('대회 정보를 불러올 수 없습니다.');
+                window.location.href = '/admin';
+            }
+        }
+
+        // 참가자 로드
+        async function loadParticipants() {
+            const tbody = document.getElementById('participants-body');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading">로딩 중...</td></tr>';
+
+            try {
+                // 현재 시세를 JSON으로 변환
+                const pricesParam = Object.keys(currentPrices).length > 0 ?
+                    JSON.stringify(currentPrices) : null;
+
+                participants = await adminAPI.getCompetitionParticipants(competitionId, pricesParam);
+
+                if (participants.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">참가자가 없습니다.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = participants.map((p, index) => {
+                    const rank = index + 1;
+                    const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                    const profitClass = p.profit_rate > 0 ? 'profit-positive' :
+                                        p.profit_rate < 0 ? 'profit-negative' : 'profit-zero';
+                    const profitSign = p.profit_rate > 0 ? '+' : '';
+
+                    return `
+                        <tr>
+                            <td class="rank ${rankClass}">${medal} ${rank}</td>
+                            <td>
+                                <div class="user-info">
+                                    <span class="user-email">${p.email}</span>
+                                    ${p.username ? `<span class="user-name">@${p.username}</span>` : ''}
+                                </div>
+                            </td>
+                            <td style="text-align: right;">${formatNumber(p.balance)}원</td>
+                            <td style="text-align: right;">${formatNumber(p.coin_value)}원</td>
+                            <td style="text-align: right;">${formatNumber(p.total_asset)}원</td>
+                            <td style="text-align: right;" class="${profitClass}">
+                                ${profitSign}${p.profit_rate.toFixed(2)}%
+                            </td>
+                            <td>${p.trade_count}건</td>
+                            <td style="display: flex; gap: 0.5rem;">
+                                <a href="/admin/participants/${p.id}" class="btn btn-primary" title="거래 내역 보기">상세</a>
+                                <button class="btn btn-secondary" onclick="showAwardModal('${p.id}', '${p.email}')">상금</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Failed to load participants:', error);
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--danger);">로드 실패 (관리자 권한 필요)</td></tr>';
+            }
+        }
+
+        // 숫자 포맷
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '-';
+            return Math.round(num).toLocaleString('ko-KR');
+        }
+
+        // 모달
+        function showEditModal() {
+            document.getElementById('edit-name').value = competition.name;
+            document.getElementById('edit-description').value = competition.description || '';
+            document.getElementById('edit-balance').value = competition.initial_balance;
+            document.getElementById('edit-fee').value = competition.fee_rate;
+            document.getElementById('edit-start').value = formatDateTimeLocal(competition.start_time);
+            document.getElementById('edit-end').value = formatDateTimeLocal(competition.end_time);
+            document.getElementById('edit-modal').classList.add('active');
+        }
+
+        function showAwardModal(participantId, email) {
+            document.getElementById('award-participant-id').value = participantId;
+            document.getElementById('award-recipient').value = email;
+            document.getElementById('award-amount').value = '';
+            document.getElementById('award-reason').value = '상금 지급';
+            document.getElementById('award-modal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function formatDateTimeLocal(isoString) {
+            // 서버는 UTC naive datetime을 반환하므로 Z를 붙여서 UTC로 파싱
+            if (!isoString.endsWith('Z') && !isoString.includes('+')) {
+                isoString = isoString + 'Z';
+            }
+            const date = new Date(isoString);  // UTC로 파싱
+
+            // 한국시간으로 변환 (UTC + 9시간)
+            const koreaOffset = 9 * 60 * 60 * 1000;
+            const koreaDate = new Date(date.getTime() + koreaOffset);
+
+            // YYYY-MM-DDTHH:MM 형식으로 반환 (UTC 메서드 사용하여 변환된 시간 그대로 출력)
+            const year = koreaDate.getUTCFullYear();
+            const month = String(koreaDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(koreaDate.getUTCDate()).padStart(2, '0');
+            const hours = String(koreaDate.getUTCHours()).padStart(2, '0');
+            const minutes = String(koreaDate.getUTCMinutes()).padStart(2, '0');
+
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        // 한국시간 문자열을 UTC ISO 문자열로 변환
+        function koreaTimeToUTC(dateTimeLocalValue) {
+            // datetime-local 값은 "YYYY-MM-DDTHH:MM" 형식
+            // 이를 한국시간으로 간주하고 UTC로 변환 (9시간 빼기)
+            const koreaOffset = 9 * 60 * 60 * 1000;
+            const [datePart, timePart] = dateTimeLocalValue.split('T');
+            const [year, month, day] = datePart.split('-').map(Number);
+            const [hours, minutes] = timePart.split(':').map(Number);
+
+            // 한국시간으로 Date 객체 생성 (UTC 기준으로 만들어서 9시간 빼기)
+            const koreaDate = new Date(Date.UTC(year, month - 1, day, hours, minutes, 0, 0));
+            const utcDate = new Date(koreaDate.getTime() - koreaOffset);
+
+            return utcDate.toISOString();
+        }
+
+        // 대회 수정
+        async function updateCompetition(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+
+            const data = {
+                name: formData.get('name'),
+                description: formData.get('description') || null,
+                initial_balance: parseFloat(formData.get('initial_balance')),
+                fee_rate: parseFloat(formData.get('fee_rate')),
+                start_time: koreaTimeToUTC(formData.get('start_time')),
+                end_time: koreaTimeToUTC(formData.get('end_time'))
+            };
+
+            try {
+                await adminAPI.updateCompetition(competitionId, data);
+                closeModal('edit-modal');
+                await loadCompetition();
+                alert('대회가 수정되었습니다.');
+            } catch (error) {
+                console.error('Failed to update competition:', error);
+                alert('수정 실패');
+            }
+        }
+
+        // 상금 지급
+        async function awardParticipant(event) {
+            event.preventDefault();
+            const participantId = document.getElementById('award-participant-id').value;
+            const amount = parseFloat(document.getElementById('award-amount').value);
+            const reason = document.getElementById('award-reason').value;
+
+            try {
+                const result = await adminAPI.awardParticipant(competitionId, {
+                    participant_id: participantId,
+                    amount: amount,
+                    reason: reason
+                });
+
+                closeModal('award-modal');
+                alert(`상금 지급 기록 완료\n\n수령자: ${result.participant.email}\n금액: ${amount.toLocaleString()}원\n사유: ${reason}`);
+            } catch (error) {
+                console.error('Failed to award:', error);
+                alert('상금 지급 기록 실패');
+            }
+        }
+
+        // 대회 활성화
+        async function activateCompetition() {
+            if (!confirm('이 대회를 활성화하시겠습니까?\n(다른 활성 대회는 자동으로 종료됩니다)')) return;
+
+            try {
+                await adminAPI.activateCompetition(competitionId);
+                await loadCompetition();
+                alert('대회가 활성화되었습니다.');
+            } catch (error) {
+                console.error('Failed to activate:', error);
+                alert('활성화 실패');
+            }
+        }
+
+        // 대회 종료
+        async function endCompetition() {
+            if (!confirm('이 대회를 종료하시겠습니까?')) return;
+
+            try {
+                await adminAPI.endCompetition(competitionId);
+                await loadCompetition();
+                alert('대회가 종료되었습니다.');
+            } catch (error) {
+                console.error('Failed to end:', error);
+                alert('종료 실패');
+            }
+        }
+
+        // 참가자 내보내기
+        function exportParticipants(format) {
+            if (participants.length === 0) {
+                alert('내보낼 참가자가 없습니다.');
+                return;
+            }
+
+            if (format === 'csv') {
+                const headers = ['순위', '이메일', '사용자명', 'KRW잔고', '코인평가액', '총자산', '수익률', '거래수'];
+                const rows = participants.map((p, i) => [
+                    i + 1,
+                    p.email,
+                    p.username || '',
+                    Math.round(p.balance),
+                    Math.round(p.coin_value),
+                    Math.round(p.total_asset),
+                    p.profit_rate.toFixed(2) + '%',
+                    p.trade_count
+                ]);
+
+                const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+                downloadFile(csvContent, `participants_${competitionId}.csv`, 'text/csv');
+
+            } else {
+                const jsonContent = JSON.stringify({
+                    competition_id: competitionId,
+                    competition_name: competition.name,
+                    exported_at: new Date().toISOString(),
+                    participants: participants.map((p, i) => ({
+                        rank: i + 1,
+                        ...p
+                    }))
+                }, null, 2);
+                downloadFile(jsonContent, `participants_${competitionId}.json`, 'application/json');
+            }
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

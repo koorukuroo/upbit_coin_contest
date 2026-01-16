@@ -1,0 +1,111 @@
+/* Theme CSS Variables */
+
+/* Dark Theme (Default) */
+:root, [data-theme="dark"] {
+    --bg-primary: #0f0f0f;
+    --bg-secondary: #1a1a1a;
+    --bg-tertiary: #222;
+    --bg-hover: #333;
+    --bg-input: #0f0f0f;
+
+    --text-primary: #fff;
+    --text-secondary: #e0e0e0;
+    --text-tertiary: #bbb;
+    --text-muted: #888;
+    --text-dimmed: #666;
+
+    --border-primary: #333;
+    --border-secondary: #222;
+
+    --accent-primary: #00d4aa;
+    --accent-hover: #00b894;
+
+    --price-up: #ef5350;
+    --price-down: #26a69a;
+    --price-even: #888;
+
+    --chart-bg: #0f0f0f;
+    --chart-grid: #222;
+
+    --code-bg: #0a0a0a;
+    --code-border: #333;
+
+    --alert-info-bg: rgba(97, 175, 239, 0.1);
+    --alert-info-border: #61afef;
+    --alert-warning-bg: rgba(209, 154, 102, 0.1);
+    --alert-warning-border: #d19a66;
+    --alert-success-bg: rgba(152, 195, 121, 0.1);
+    --alert-success-border: #98c379;
+
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e8e8e8;
+    --bg-hover: #ddd;
+    --bg-input: #fff;
+
+    --text-primary: #1a1a1a;
+    --text-secondary: #333;
+    --text-tertiary: #555;
+    --text-muted: #777;
+    --text-dimmed: #999;
+
+    --border-primary: #ddd;
+    --border-secondary: #e5e5e5;
+
+    --accent-primary: #00a884;
+    --accent-hover: #008f70;
+
+    --price-up: #d32f2f;
+    --price-down: #00897b;
+    --price-even: #777;
+
+    --chart-bg: #ffffff;
+    --chart-grid: #eee;
+
+    --code-bg: #f8f8f8;
+    --code-border: #ddd;
+
+    --alert-info-bg: rgba(97, 175, 239, 0.15);
+    --alert-info-border: #4a90d9;
+    --alert-warning-bg: rgba(209, 154, 102, 0.15);
+    --alert-warning-border: #c08040;
+    --alert-success-bg: rgba(152, 195, 121, 0.15);
+    --alert-success-border: #5a9a3a;
+
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.theme-toggle-icon {
+    font-size: 1rem;
+}
+
+/* Smooth transition for theme changes */
+body.theme-transitioning,
+body.theme-transitioning * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}

@@ -1,0 +1,5 @@
+# 도메인을 실제 사용할 도메인으로 변경하세요
+# Replace with your actual domain
+your-domain.com {
+    reverse_proxy localhost:8000
+}

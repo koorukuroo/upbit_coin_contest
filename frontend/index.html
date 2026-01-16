@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upbit Real-time Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Theme JS (load early to prevent flash) -->
+    <script src="/static/common/theme.js"></script>
+    <!-- Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header>
+        <h1>Upbit Real-time Dashboard</h1>
+        <div class="header-right">
+            <span id="theme-toggle-container"></span>
+            <span id="current-time"></span>
+            <span id="connection-status" class="disconnected">Disconnected</span>
+        </div>
+    </header>
+
+    <!-- 티커 보드 -->
+    <section id="ticker-board">
+        <div class="ticker-card" data-code="KRW-BTC">
+            <div class="ticker-name">BTC</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-ETH">
+            <div class="ticker-name">ETH</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-XRP">
+            <div class="ticker-name">XRP</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-SOL">
+            <div class="ticker-name">SOL</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-DOGE">
+            <div class="ticker-name">DOGE</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-ADA">
+            <div class="ticker-name">ADA</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-AVAX">
+            <div class="ticker-name">AVAX</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-DOT">
+            <div class="ticker-name">DOT</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-LINK">
+            <div class="ticker-name">LINK</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+        <div class="ticker-card" data-code="KRW-MATIC">
+            <div class="ticker-name">MATIC</div>
+            <div class="ticker-price">-</div>
+            <div class="ticker-change">-</div>
+        </div>
+    </section>
+
+    <!-- 차트 컨트롤 -->
+    <section id="chart-controls">
+        <div class="control-group">
+            <label>코인 선택:</label>
+            <select id="coin-select">
+                <option value="KRW-BTC">BTC</option>
+                <option value="KRW-ETH">ETH</option>
+                <option value="KRW-XRP">XRP</option>
+                <option value="KRW-SOL">SOL</option>
+                <option value="KRW-DOGE">DOGE</option>
+                <option value="KRW-ADA">ADA</option>
+                <option value="KRW-AVAX">AVAX</option>
+                <option value="KRW-DOT">DOT</option>
+                <option value="KRW-LINK">LINK</option>
+                <option value="KRW-MATIC">MATIC</option>
+            </select>
+        </div>
+        <div class="control-group interval-buttons">
+            <button class="interval-btn active" data-interval="1m">1m</button>
+            <button class="interval-btn" data-interval="5m">5m</button>
+            <button class="interval-btn" data-interval="15m">15m</button>
+            <button class="interval-btn" data-interval="1h">1h</button>
+            <button class="interval-btn" data-interval="1d">1d</button>
+        </div>
+        <div class="control-group chart-tools">
+            <button class="tool-btn" id="btn-fit" title="자동 맞춤">
+                <span>Fit</span>
+            </button>
+            <button class="tool-btn" id="btn-reset" title="차트 리셋">
+                <span>Reset</span>
+            </button>
+            <button class="tool-btn toggle" id="btn-percent" title="퍼센트 모드">
+                <span>%</span>
+            </button>
+            <button class="tool-btn toggle" id="btn-log" title="로그 스케일">
+                <span>Log</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 차트 영역 -->
+    <section id="chart-section">
+        <div id="chart-container"></div>
+    </section>
+
+    <!-- 실시간 거래 내역 -->
+    <section id="trades-section">
+        <div class="trades-header">
+            <h3>실시간 거래 내역</h3>
+            <div class="trades-stats">
+                <span>수신: <strong id="tick-count">0</strong></span>
+                <span>TPS: <strong id="tps">0</strong></span>
+            </div>
+        </div>
+        <div class="trades-table-wrapper">
+            <table id="trades-table">
+                <thead>
+                    <tr>
+                        <th>시간</th>
+                        <th>코인</th>
+                        <th>가격</th>
+                        <th>수량</th>
+                        <th>변동률</th>
+                        <th>매수/매도</th>
+                    </tr>
+                </thead>
+                <tbody id="trades-body">
+                    <!-- 실시간 데이터가 여기에 추가됨 -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 요약 통계 -->
+    <section id="summary-section">
+        <h3>요약 통계 <span id="summary-code"></span></h3>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-label">시가</div>
+                <div class="summary-value" id="summary-open">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">고가</div>
+                <div class="summary-value rise" id="summary-high">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">저가</div>
+                <div class="summary-value fall" id="summary-low">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">종가</div>
+                <div class="summary-value" id="summary-close">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">변동률</div>
+                <div class="summary-value" id="summary-change">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">거래량</div>
+                <div class="summary-value" id="summary-volume">-</div>
+            </div>
+        </div>
+    </section>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
