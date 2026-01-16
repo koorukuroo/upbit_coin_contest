@@ -4,6 +4,10 @@
 
 ---
 
+<img width="1912" height="1237" alt="SCR-20260116-tbva" src="https://github.com/user-attachments/assets/f2492577-475b-46d9-83ef-4ed35ed3f969" />
+<img width="1912" height="1237" alt="SCR-20260116-tcit" src="https://github.com/user-attachments/assets/7444c376-70a8-4589-bda3-8be90786b261" />
+
+
 ## 한국어
 
 실시간 Upbit 시세를 기반으로 한 모의 투자 대회 플랫폼입니다.
@@ -302,3 +306,4 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 ### License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
